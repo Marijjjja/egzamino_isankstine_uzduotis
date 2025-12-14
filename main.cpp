@@ -2,5 +2,12 @@
 using namespace std;
 
 int main(){
-    test();
+    string url;
+    cout << "url: "<< endl;
+    cin >> url;
+
+    string cmd = "./get_text.sh " + url;
+    system(cmd.c_str());
+
+    ifstream in("input.txt");
 }

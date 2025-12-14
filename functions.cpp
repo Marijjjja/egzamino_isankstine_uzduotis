@@ -1,6 +1,8 @@
 #include "header.h"
 using namespace std;
 
-void test(){
-    cout <<"labs"<< endl;
+
+void surasymas_i_txt(){
+    ofstream rezultatas("rezultatas.txt");
+
 }

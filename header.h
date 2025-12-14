@@ -11,4 +11,4 @@
 
 using namespace std;
 
-void test();
+void surasymas_i_txt();
