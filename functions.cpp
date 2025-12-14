@@ -1,6 +1,6 @@
 #include "header.h"
 using namespace std;
 
-int main(){
-    test();
+void test(){
+    cout <<"labs"<< endl;
 }
