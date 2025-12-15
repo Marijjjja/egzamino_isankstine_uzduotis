@@ -2,12 +2,13 @@
 using namespace std;
 
 int main(){
-    string url;
-    cout << "url: "<< endl;
-    cin >> url;
+    url_nuskaitymas();
 
-    string cmd = "./get_text.sh " + url;
-    system(cmd.c_str());
+    //patikrinimas, ar txt file'as susikure ir nuskaito viska
+    if(validacija("input.txt")){
+        cout << "Validacija sėkminga!" << endl;
+        zodziu_isrinkimas("input.txt");
+    }
 
-    ifstream in("input.txt");
+
 }

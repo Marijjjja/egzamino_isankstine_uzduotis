@@ -1,3 +1,6 @@
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra
+
 app: main.o functions.o
 	g++ main.o functions.o -o app
 
