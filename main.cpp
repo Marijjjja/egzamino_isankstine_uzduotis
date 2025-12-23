@@ -9,6 +9,4 @@ int main(){
         cout << "Validacija sėkminga!" << endl;
         zodziu_isrinkimas("input.txt");
     }
-
-
 }
