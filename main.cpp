@@ -12,12 +12,6 @@ int main(){
         cout << "Validacija sėkminga!" << endl;
         result = zodziu_isrinkimas("input.txt");
     }
-    for (const auto& s : result.special_words)
-        cout << s << '\n';
-
-    for (const auto& s : result.tekstas)
-        cout << s << '\n';
-
 
     auto tlds = loadTLDs("domain.txt");
     write_report(result.tekstas, result.special_words, "report.txt");

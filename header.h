@@ -18,8 +18,10 @@ using namespace std;
 
 struct Result {
     string tekstas;
-    vector<string> special_words;
+    set<string> special_words;
 };
+bool starts_with(const string& s, const string& prefix);
+bool is_link(const string& s);
 
 void url_nuskaitymas();
 void domain_url_nuskaitymas();
@@ -29,7 +31,8 @@ Result zodziu_isrinkimas(const string& filename);
 unordered_set<string> loadTLDs(const std::string& filename);
 
 void write_report(const string& tekstas,
-                  const vector<string>& special_words,
+                  const set<string>& special_words,
                   const string& output_file);
+bool has_valid_domain(const string& link);
 
 void surasymas_i_txt();

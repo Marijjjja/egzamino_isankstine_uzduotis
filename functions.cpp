@@ -9,6 +9,70 @@ static inline string toUpper(string s){
     return s;
 }
 
+bool has_valid_domain(const string& link) {
+    // 1. find last dot
+    size_t dot = link.find_last_of('.');
+    if (dot == string::npos || dot + 1 >= link.size())
+        return false;
+
+    // 2. extract candidate TLD
+    string tld = link.substr(dot + 1);
+
+    // strip trailing non-letters
+    while (!tld.empty() && !isalpha(static_cast<unsigned char>(tld.back())))
+        tld.pop_back();
+
+    if (tld.empty())
+        return false;
+
+    // normalize to lowercase
+    for (char& c : tld)
+        c = tolower(static_cast<unsigned char>(c));
+
+    // 3. open domain.txt and check
+    ifstream file("domain.txt");
+    if (!file.is_open())
+        return false;
+
+    string allowed;
+    while (file >> allowed) {
+        // normalize domain.txt entry
+        for (char& c : allowed)
+            c = tolower(static_cast<unsigned char>(c));
+
+        if (allowed == tld)
+            return true;
+    }
+
+    return false;
+}
+
+
+bool starts_with(const string& s, const string& prefix) {
+    return s.size() >= prefix.size() &&
+           s.compare(0, prefix.size(), prefix) == 0;
+}
+
+bool is_link(const string& s) {
+    if (s.empty()) return false;
+
+    if (starts_with(s, "http://") || starts_with(s, "https://"))
+        return true;
+
+    if (starts_with(s, "www."))
+        return true;
+
+    if (s.find('.') != string::npos &&
+        s.find('/') == string::npos &&
+        s.find(':') == string::npos &&
+        s.front() != '.' &&
+        s.back() != '.')
+        return true;
+
+    return false;
+}
+
+
 unordered_set<string> loadTLDs(const string& filename){
     ifstream file(filename);
     if (!file) {
@@ -78,9 +142,8 @@ bool validacija(const string& filename) {
 
 Result zodziu_isrinkimas(const string& filename) {
     ifstream file(filename);
-
     map<string, set<int>> zodziai;
-    vector<string> special_words;
+    set<string> special_words;
 
     string line, word, special, tekstas;
     int line_nr = 0;
@@ -123,17 +186,12 @@ Result zodziu_isrinkimas(const string& filename) {
                 special += tolower(static_cast<unsigned char>(c));
 
             } else {
-                if (!special.empty() &&
-                    has_special &&
-                    has_letter &&
-                    (!has_dot || dot_followed_by_letter)) {
-
-                    // remove trailing ':'
+                if (!special.empty()) {
                     while (!special.empty() && special.back() == ':')
                         special.pop_back();
 
-                    if (!special.empty())
-                        special_words.push_back(special);
+                    if (is_link(special) && has_valid_domain(special))
+                        special_words.insert(special);
                 }
 
                 special.clear();
@@ -157,27 +215,27 @@ Result zodziu_isrinkimas(const string& filename) {
                 special.pop_back();
 
             if (!special.empty())
-                special_words.push_back(special);
+                special_words.insert(special);
         }
     }
 
-    // for (const auto& [zodis, eilutes] : zodziai) {
-    //     if (eilutes.size() > 1) {
-    //         cout << zodis << ": ";
-    //         for (int e : eilutes) cout << e << " ";
-    //         cout << '\n';
-    //     }
-    // }
+    for (const auto& [zodis, eilutes] : zodziai) {
+        if (eilutes.size() > 1) {
+            cout << zodis << ": ";
+            for (int e : eilutes) cout << e << " ";
+            cout << '\n';
+        }
+    }
 
-    // cout << "\nSpecial words:\n";
-    // for (const auto& s : special_words)
-    //     cout << s << '\n';
+    cout << "\nSpecial words:\n";
+    for (const auto& s : special_words)
+        cout << s << '\n';
 
     return {tekstas, special_words};
 }
 
 void write_report(const string& tekstas,
-                  const vector<string>& special_words,
+                  const set<string>& special_words,
                   const string& output_file){
 
     ofstream out(output_file);
@@ -208,12 +266,12 @@ void write_report(const string& tekstas,
             ++word_count[word];
     }
 
-    out << "Word occurrences:\n\n";
+    out << "Žodžių dažniai:\n\n";
     for (const auto& [w, count] : word_count) {
         out << w << " : " << count << '\n';
     }
 
-    out << "\nSpecial words:\n\n";
+    out << "\n--- --- Linkai --- ---:\n\n";
     for (const auto& s : special_words) {
         out << s << '\n';
     }
@@ -223,3 +281,4 @@ void write_report(const string& tekstas,
 void surasymas_i_txt(){
     ofstream rezultatas("rezultatas.txt");
 }
+
