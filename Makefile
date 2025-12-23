@@ -1,3 +1,6 @@
+# CXX = g++
+# CXXFLAGS = -std=c++11 -Wall -Wextra 
+
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra
 
@@ -5,10 +8,10 @@ app: main.o functions.o
 	g++ main.o functions.o -o app
 
 main.o: main.cpp header.h
-	g++ -c main.cpp
+	$(CXX) $(CXXFLAGS) -c main.cpp
 
 functions.o: functions.cpp header.h
-	g++ -c functions.cpp
+	$(CXX) $(CXXFLAGS) -c functions.cpp
 
 run: app
 	@./app
