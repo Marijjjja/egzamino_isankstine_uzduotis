@@ -15,15 +15,18 @@
 #include <unordered_set>
 
 using namespace std;
-void url_nuskaitymas();
-bool validacija(const string& filename);
-void zodziu_isrinkimas(const string& filename);
 
-//static string extractTLD(const string& url);
-// unordered_set<string> loadTLDs(const string& filename);
-// vector<string> extractValidLinks(
-//     const string& text,
-//     const unordered_set<string>& validTLDs
-// );
+struct Result {
+    string tekstas;
+    vector<string> special_words;
+};
+
+void url_nuskaitymas();
+void domain_url_nuskaitymas();
+bool validacija(const string& filename);
+Result zodziu_isrinkimas(const string& filename);
+
+unordered_set<string> loadTLDs(const std::string& filename);
+
 
 void surasymas_i_txt();
