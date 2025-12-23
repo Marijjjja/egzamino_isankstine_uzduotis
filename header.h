@@ -28,5 +28,8 @@ Result zodziu_isrinkimas(const string& filename);
 
 unordered_set<string> loadTLDs(const std::string& filename);
 
+void write_report(const string& tekstas,
+                  const vector<string>& special_words,
+                  const string& output_file);
 
 void surasymas_i_txt();

@@ -2,6 +2,7 @@
 using namespace std;
 
 int main(){
+    Result result;
     string tekstas;
     url_nuskaitymas();
     domain_url_nuskaitymas();
@@ -9,10 +10,16 @@ int main(){
     //patikrinimas, ar txt file'as susikure ir nuskaito viska
     if(validacija("input.txt")){
         cout << "Validacija sėkminga!" << endl;
-        auto result = zodziu_isrinkimas("file.txt");
+        result = zodziu_isrinkimas("input.txt");
     }
-    
-    // result.tekstas arba result.special_words
+    for (const auto& s : result.special_words)
+        cout << s << '\n';
+
+    for (const auto& s : result.tekstas)
+        cout << s << '\n';
+
+
     auto tlds = loadTLDs("domain.txt");
+    write_report(result.tekstas, result.special_words, "report.txt");
 
 }

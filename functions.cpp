@@ -75,6 +75,7 @@ bool validacija(const string& filename) {
     return true;
 }
 
+
 Result zodziu_isrinkimas(const string& filename) {
     ifstream file(filename);
 
@@ -99,8 +100,8 @@ Result zodziu_isrinkimas(const string& filename) {
         for (char c : line) {
 
             // normal words
-            if (isalpha(c)) {
-                word += tolower(c);
+            if (isalpha(static_cast<unsigned char>(c))) {
+                word += tolower(static_cast<unsigned char>(c));
             } else {
                 if (!word.empty()) {
                     zodziai[word].insert(line_nr);
@@ -109,9 +110,9 @@ Result zodziu_isrinkimas(const string& filename) {
             }
 
             // special token logic
-            if (isalpha(c) || c == '.' || c == '/' || c == ':') {
+            if (isalpha(static_cast<unsigned char>(c)) || c == '.' || c == '/' || c == ':') {
 
-                if (isalpha(c)) {
+                if (isalpha(static_cast<unsigned char>(c))) {
                     has_letter = true;
                     if (has_dot) dot_followed_by_letter = true;
                 }
@@ -119,7 +120,7 @@ Result zodziu_isrinkimas(const string& filename) {
                 if (c == '.' || c == '/' || c == ':') has_special = true;
                 if (c == '.') has_dot = true;
 
-                special += tolower(c);
+                special += tolower(static_cast<unsigned char>(c));
 
             } else {
                 if (!special.empty() &&
@@ -160,21 +161,63 @@ Result zodziu_isrinkimas(const string& filename) {
         }
     }
 
-    for (const auto& [zodis, eilutes] : zodziai) {
-        if (eilutes.size() > 1) {
-            cout << zodis << ": ";
-            for (int e : eilutes) cout << e << " ";
-            cout << '\n';
-        }
-    }
+    // for (const auto& [zodis, eilutes] : zodziai) {
+    //     if (eilutes.size() > 1) {
+    //         cout << zodis << ": ";
+    //         for (int e : eilutes) cout << e << " ";
+    //         cout << '\n';
+    //     }
+    // }
 
-    cout << "\nSpecial words:\n";
-    for (const auto& s : special_words)
-        cout << s << '\n';
+    // cout << "\nSpecial words:\n";
+    // for (const auto& s : special_words)
+    //     cout << s << '\n';
 
-    return {tekstas, special_words};;
+    return {tekstas, special_words};
 }
 
+void write_report(const string& tekstas,
+                  const vector<string>& special_words,
+                  const string& output_file){
+
+    ofstream out(output_file);
+    if (!out.is_open()) {
+        cerr << "Failed to open file: " << output_file << '\n';
+        return;
+    }
+
+    map<string, int> word_count;
+
+    istringstream iss(tekstas);
+    string line, word;
+
+    while (getline(iss, line)) {
+        word.clear();
+
+        for (char c : line) {
+            if (isalpha(static_cast<unsigned char>(c))) {
+                word += tolower(static_cast<unsigned char>(c));
+            } else {
+                if (!word.empty()) {
+                    ++word_count[word];
+                    word.clear();
+                }
+            }
+        }
+        if (!word.empty())
+            ++word_count[word];
+    }
+
+    out << "Word occurrences:\n\n";
+    for (const auto& [w, count] : word_count) {
+        out << w << " : " << count << '\n';
+    }
+
+    out << "\nSpecial words:\n\n";
+    for (const auto& s : special_words) {
+        out << s << '\n';
+    }
+}
 
 
 void surasymas_i_txt(){
