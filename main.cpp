@@ -7,7 +7,6 @@ int main(){
     url_nuskaitymas();
     domain_url_nuskaitymas();
 
-    //patikrinimas, ar txt file'as susikure ir nuskaito viska
     if(validacija("input.txt")){
         cout << "Validacija sėkminga!" << endl;
         result = zodziu_isrinkimas("input.txt");

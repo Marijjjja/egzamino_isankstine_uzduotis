@@ -1,42 +1,44 @@
 #include <algorithm>
 #include <cctype>
-
 #include "header.h"
 using namespace std;
 
-static inline string toUpper(string s){
-    for (auto& ch : s) ch = (char)toupper((unsigned char)ch);
-    return s;
+bool has_any_valid_domain(const string& text) {
+    regex domain_regex(R"((https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})");
+
+    auto begin = sregex_iterator(text.begin(), text.end(), domain_regex);
+    auto end   = sregex_iterator();
+
+    for (auto it = begin; it != end; ++it) {
+        string match = it->str();
+        if (has_valid_domain(match))
+            return true;
+    }
+    return false;
 }
 
 bool has_valid_domain(const string& link) {
-    // 1. find last dot
     size_t dot = link.find_last_of('.');
     if (dot == string::npos || dot + 1 >= link.size())
         return false;
 
-    // 2. extract candidate TLD
     string tld = link.substr(dot + 1);
 
-    // strip trailing non-letters
     while (!tld.empty() && !isalpha(static_cast<unsigned char>(tld.back())))
         tld.pop_back();
 
     if (tld.empty())
         return false;
 
-    // normalize to lowercase
     for (char& c : tld)
         c = tolower(static_cast<unsigned char>(c));
 
-    // 3. open domain.txt and check
     ifstream file("domain.txt");
     if (!file.is_open())
         return false;
 
     string allowed;
     while (file >> allowed) {
-        // normalize domain.txt entry
         for (char& c : allowed)
             c = tolower(static_cast<unsigned char>(c));
 
@@ -80,17 +82,17 @@ unordered_set<string> loadTLDs(const string& filename){
         return {};
     }
 
-    unordered_set<std::string> tlds;
+    unordered_set<string> tlds;
     string line;
 
-    while (std::getline(file, line)) {
+    while (getline(file, line)) {
         if (line.empty()) continue;
         if (line[0] == '#') continue;
 
-        while (!line.empty() && std::isspace((unsigned char)line.back()))
+        while (!line.empty() && isspace((unsigned char)line.back()))
             line.pop_back();
 
-        while (!line.empty() && std::isspace((unsigned char)line.front()))
+        while (!line.empty() && isspace((unsigned char)line.front()))
             line.erase(line.begin());
 
         for (char& c : line)
@@ -115,7 +117,7 @@ void url_nuskaitymas(){
 }
 
 void domain_url_nuskaitymas(){
-    string url = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt";
+    string url = "https://data.iana.org/TLD/tlds-alpha-by-std";
 
     string cmd = "./get_domain.sh " + url;
     system(cmd.c_str());
@@ -162,7 +164,6 @@ Result zodziu_isrinkimas(const string& filename) {
 
         for (char c : line) {
 
-            // normal words
             if (isalpha(static_cast<unsigned char>(c))) {
                 word += tolower(static_cast<unsigned char>(c));
             } else {
@@ -172,8 +173,7 @@ Result zodziu_isrinkimas(const string& filename) {
                 }
             }
 
-            // special token logic
-            if (isalpha(static_cast<unsigned char>(c)) || c == '.' || c == '/' || c == ':') {
+            if (isalpha(static_cast<unsigned char>(c)) || c == '.' || c == '/' || c == ':' || c == '_') {
 
                 if (isalpha(static_cast<unsigned char>(c))) {
                     has_letter = true;
@@ -190,7 +190,7 @@ Result zodziu_isrinkimas(const string& filename) {
                     while (!special.empty() && special.back() == ':')
                         special.pop_back();
 
-                    if (is_link(special) && has_valid_domain(special))
+                    if (is_link(special) && has_any_valid_domain(special))
                         special_words.insert(special);
                 }
 
@@ -202,7 +202,6 @@ Result zodziu_isrinkimas(const string& filename) {
             }
         }
 
-        // flush end-of-line
         if (!word.empty())
             zodziai[word].insert(line_nr);
 
@@ -214,22 +213,10 @@ Result zodziu_isrinkimas(const string& filename) {
             while (!special.empty() && special.back() == ':')
                 special.pop_back();
 
-            if (!special.empty())
+            if (is_link(special) && has_any_valid_domain(special))
                 special_words.insert(special);
         }
     }
-
-    for (const auto& [zodis, eilutes] : zodziai) {
-        if (eilutes.size() > 1) {
-            cout << zodis << ": ";
-            for (int e : eilutes) cout << e << " ";
-            cout << '\n';
-        }
-    }
-
-    cout << "\nSpecial words:\n";
-    for (const auto& s : special_words)
-        cout << s << '\n';
 
     return {tekstas, special_words};
 }
@@ -271,7 +258,7 @@ void write_report(const string& tekstas,
         out << w << " : " << count << '\n';
     }
 
-    out << "\n--- --- Linkai --- ---:\n\n";
+    out << "\n --- --- --- --- --- --- Linkai --- --- --- --- --- --- --- --- \n\n";
     for (const auto& s : special_words) {
         out << s << '\n';
     }
