@@ -117,13 +117,13 @@ void url_nuskaitymas(){
 }
 
 void domain_url_nuskaitymas(){
-    string url = "https://data.iana.org/TLD/tlds-alpha-by-std";
+    string url = "https://data.iana.org/TLD/tlds-alpha-by-domain.txt";
 
     string cmd = "./get_domain.sh " + url;
     system(cmd.c_str());
 
     ifstream in("domain.txt");
-    cout<< "nuskaityta naujausia domain info" << endl;
+    cout<< "Nuskaityta naujausia domain info" << endl;
 }
 
 bool validacija(const string& filename) {
@@ -140,7 +140,6 @@ bool validacija(const string& filename) {
     }
     return true;
 }
-
 
 Result zodziu_isrinkimas(const string& filename) {
     ifstream file(filename);
@@ -205,10 +204,7 @@ Result zodziu_isrinkimas(const string& filename) {
         if (!word.empty())
             zodziai[word].insert(line_nr);
 
-        if (!special.empty() &&
-            has_special &&
-            has_letter &&
-            (!has_dot || dot_followed_by_letter)) {
+        if (!special.empty()){
 
             while (!special.empty() && special.back() == ':')
                 special.pop_back();
@@ -218,12 +214,15 @@ Result zodziu_isrinkimas(const string& filename) {
         }
     }
 
-    return {tekstas, special_words};
+    // cout << "\nSpecial words:\n";
+    // for (const auto& s : special_words)
+    //     cout << s << '\n';
+
+    return {tekstas, special_words, zodziai};
 }
 
-void write_report(const string& tekstas,
-                  const set<string>& special_words,
-                  const string& output_file){
+
+void write_report(const Result& res, const string& output_file){
 
     ofstream out(output_file);
     if (!out.is_open()) {
@@ -231,37 +230,26 @@ void write_report(const string& tekstas,
         return;
     }
 
-    map<string, int> word_count;
+    // out << "Žodžių dažniai (tik > 1):\n\n";
 
-    istringstream iss(tekstas);
-    string line, word;
+    // for (const auto& [word, lines] : res.zodziai) {
+    //     if (lines.size() > 1)
+    //         out << word << " : " << lines.size() << '\n';
+    // }
 
-    while (getline(iss, line)) {
-        word.clear();
+    out << "\nCross-reference (eilutės):\n\n";
 
-        for (char c : line) {
-            if (isalpha(static_cast<unsigned char>(c))) {
-                word += tolower(static_cast<unsigned char>(c));
-            } else {
-                if (!word.empty()) {
-                    ++word_count[word];
-                    word.clear();
-                }
-            }
+    for (const auto& [word, lines] : res.zodziai) {
+        if (lines.size() > 1) {
+            out << word << " (" << lines.size() << ") : ";
+            for (int ln : lines) out << ln << " ";
+            out << '\n';
         }
-        if (!word.empty())
-            ++word_count[word];
-    }
-
-    out << "Žodžių dažniai:\n\n";
-    for (const auto& [w, count] : word_count) {
-        out << w << " : " << count << '\n';
     }
 
     out << "\n --- --- --- --- --- --- Linkai --- --- --- --- --- --- --- --- \n\n";
-    for (const auto& s : special_words) {
+    for (const auto& s : res.special_words)
         out << s << '\n';
-    }
 }
 
 

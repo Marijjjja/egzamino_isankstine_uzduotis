@@ -13,6 +13,7 @@ int main(){
     }
 
     auto tlds = loadTLDs("domain.txt");
-    write_report(result.tekstas, result.special_words, "report.txt");
+    write_report(result, "report.txt");
+    // write_report(result.tekstas, result.special_words, "report.txt");
 
 }
