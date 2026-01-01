@@ -19,7 +19,7 @@ using namespace std;
 struct Result {
     string tekstas;
     set<string> special_words;
-    map<string, set<int>> zodziai;
+    map<string, vector<int>> zodziai;
 };
 bool starts_with(const string& s, const string& prefix);
 bool is_link(const string& s);
@@ -35,7 +35,5 @@ unordered_set<string> loadTLDs(const std::string& filename);
 
 void write_report(const Result& res,
                   const string& output_file);
-                  
-bool has_valid_domain(const string& link);
 
-void surasymas_i_txt();
+bool has_valid_domain(const string& link);

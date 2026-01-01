@@ -143,7 +143,7 @@ bool validacija(const string& filename) {
 
 Result zodziu_isrinkimas(const string& filename) {
     ifstream file(filename);
-    map<string, set<int>> zodziai;
+    map<string, vector<int>> zodziai;
     set<string> special_words;
 
     string line, word, special, tekstas;
@@ -167,7 +167,7 @@ Result zodziu_isrinkimas(const string& filename) {
                 word += tolower(static_cast<unsigned char>(c));
             } else {
                 if (!word.empty()) {
-                    zodziai[word].insert(line_nr);
+                    zodziai[word].push_back(line_nr);
                     word.clear();
                 }
             }
@@ -202,7 +202,7 @@ Result zodziu_isrinkimas(const string& filename) {
         }
 
         if (!word.empty())
-            zodziai[word].insert(line_nr);
+            zodziai[word].push_back(line_nr);
 
         if (!special.empty()){
 
@@ -213,10 +213,6 @@ Result zodziu_isrinkimas(const string& filename) {
                 special_words.insert(special);
         }
     }
-
-    // cout << "\nSpecial words:\n";
-    // for (const auto& s : special_words)
-    //     cout << s << '\n';
 
     return {tekstas, special_words, zodziai};
 }
@@ -251,9 +247,3 @@ void write_report(const Result& res, const string& output_file){
     for (const auto& s : res.special_words)
         out << s << '\n';
 }
-
-
-void surasymas_i_txt(){
-    ofstream rezultatas("rezultatas.txt");
-}
-
