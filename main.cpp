@@ -3,8 +3,12 @@ using namespace std;
 
 int main(){
     Result result;
-    string tekstas;
-    url_nuskaitymas();
+
+    // string pattern;
+    // cout << "iveskite patterna: ";
+    // cin >> pattern;
+
+    //url_nuskaitymas();
     domain_url_nuskaitymas();
 
     if(validacija("input.txt")){
@@ -13,6 +17,10 @@ int main(){
     }
 
     auto tlds = loadTLDs("domain.txt");
+    // void write_report(const Result& res,
+    //               const string& output_file,
+    //               const string& pattern);
+
     write_report(result, "report.txt");
     // write_report(result.tekstas, result.special_words, "report.txt");
 

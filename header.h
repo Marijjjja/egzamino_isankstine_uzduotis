@@ -36,4 +36,9 @@ unordered_set<string> loadTLDs(const std::string& filename);
 void write_report(const Result& res,
                   const string& output_file);
 
+// void write_report(const Result& res,
+//                   const string& output_file,
+//                   const string& pattern);
+
 bool has_valid_domain(const string& link);
+string normalize_lt(const string& s);
